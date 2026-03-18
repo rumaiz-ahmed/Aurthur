@@ -1,0 +1,15 @@
+{
+  "provider": "ollama",
+  "baseUrl": "http://localhost:11434/v1",
+  "model": "llama3",
+  "embeddingModel": "nomic-embed-text",
+  "soulPath": "./SOUL.md",
+  "knowledgePath": "./knowledge",
+  "conversationsPath": "./conversations",
+  "learning": {
+    "enabled": true,
+    "logConversations": true,
+    "requestFeedback": true,
+    "autoInfer": true
+  }
+}

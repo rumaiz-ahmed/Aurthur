@@ -13,6 +13,18 @@ import {
   helloCommand,
   openCommand,
   searchWebCommand,
+  brainStatusCommand,
+  brainSetProviderCommand,
+  brainModelsCommand,
+  brainLearnCommand,
+  brainReindexCommand,
+  soulCommand,
+  soulReadCommand,
+  soulEditCommand,
+  soulLearnCommand,
+  soulResetCommand,
+  skillsCommand,
+  skillTestCommand,
 } from "./commands";
 
 const commandRegistry = createCommandRegistry();
@@ -37,5 +49,17 @@ commandRegistry.register(sysinfoCommand);
 commandRegistry.register(helloCommand);
 commandRegistry.register(openCommand);
 commandRegistry.register(searchWebCommand);
+commandRegistry.register(brainStatusCommand);
+commandRegistry.register(brainSetProviderCommand);
+commandRegistry.register(brainModelsCommand);
+commandRegistry.register(brainLearnCommand);
+commandRegistry.register(brainReindexCommand);
+commandRegistry.register(soulCommand);
+commandRegistry.register(soulReadCommand);
+commandRegistry.register(soulEditCommand);
+commandRegistry.register(soulLearnCommand);
+commandRegistry.register(soulResetCommand);
+commandRegistry.register(skillsCommand);
+commandRegistry.register(skillTestCommand);
 
 export { commandRegistry };
