@@ -9,20 +9,29 @@ interface InputBoxProps {
 export function InputBox({ value, onInput, onSubmit }: InputBoxProps) {
   return (
     <box
-      style={{ border: true, borderStyle: "rounded", borderColor: "#1a1a2e" }}
-      padding={1}
+      paddingY={1}
+      marginTop={1}
     >
-      <text fg="#00d4ff" marginRight={1}>›</text>
-      <input
-        placeholder="Ask ARTHUR anything..."
-        value={value}
-        onInput={(val: string) => onInput(val)}
-        onSubmit={onSubmit}
-        flexGrow={1}
-      />
-      <text fg="#666666" marginLeft={1} attributes={TextAttributes.DIM}>
-        [Enter]
-      </text>
+      <box
+        paddingX={2}
+        paddingY={1}
+      >
+        <text fg="#00d4ff" attributes={TextAttributes.BOLD} marginRight={1}>
+          ›
+        </text>
+        <input
+          placeholder="Ask me anything..."
+          value={value}
+          onInput={(val: string) => onInput(val)}
+          onSubmit={onSubmit}
+          flexGrow={1}
+        />
+        <box marginLeft={2}>
+          <text fg="#00d4ff" attributes={TextAttributes.DIM}>
+            ↵
+          </text>
+        </box>
+      </box>
     </box>
   );
 }

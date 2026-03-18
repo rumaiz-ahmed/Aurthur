@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createBrainEngine } from "../brain/engine";
 
 export function Header() {
@@ -7,7 +7,8 @@ export function Header() {
     provider: string;
     model: string;
     brainEnabled: boolean;
-  } | null>(null);
+    connected: boolean;
+  }>({ provider: "", model: "", brainEnabled: false, connected: false });
 
   useEffect(() => {
     try {
@@ -17,26 +18,47 @@ export function Header() {
         provider: s.provider,
         model: s.model,
         brainEnabled: true,
+        connected: s.provider !== "Command-only",
       });
     } catch {
       setStats({
-        provider: "Command-only",
+        provider: "Offline",
         model: "No brain",
         brainEnabled: false,
+        connected: false,
       });
     }
   }, []);
 
   return (
-    <box flexDirection="column" alignItems="center" marginBottom={1}>
-      <ascii-font font="block" text="ARTHUR" />
-      <box marginTop={1}>
+    <box flexDirection="column" alignItems="center" marginBottom={2}>
+      <box marginBottom={1}>
         <text fg="#00d4ff" attributes={TextAttributes.BOLD}>
-          {stats?.brainEnabled ? "🧠 Brain Active" : "⚡ Command Mode"}
+          ┌───────────────────────────────┐
         </text>
-        {stats?.brainEnabled && (
-          <text fg="#888888" marginLeft={2}>
-            {stats.provider} • {stats.model}
+      </box>
+      <box>
+        <text fg="#00d4ff" attributes={TextAttributes.BOLD}>│  </text>
+        <text fg="#00d4ff" attributes={TextAttributes.BOLD}>  ARTHUR  </text>
+        <text fg="#00d4ff" attributes={TextAttributes.BOLD}>  │</text>
+      </box>
+      <box marginBottom={1}>
+        <text fg="#00d4ff" attributes={TextAttributes.BOLD}>
+          └───────────────────────────────┘
+        </text>
+      </box>
+      <box gap={2}>
+        <box>
+          <text fg={stats.connected ? "#00ff88" : "#ff6b6b"}>
+            {stats.connected ? "●" : "○"}
+          </text>
+          <text fg="#888888" marginLeft={1}>
+            {stats.brainEnabled ? stats.provider : "Command Mode"}
+          </text>
+        </box>
+        {stats.brainEnabled && (
+          <text fg="#666666">
+            {stats.model}
           </text>
         )}
       </box>
