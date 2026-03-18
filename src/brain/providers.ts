@@ -33,7 +33,7 @@ export const PROVIDER_PRESETS: Record<string, ProviderConfig> = {
   cerebras: {
     name: "Cerebras",
     baseUrl: "https://api.cerebras.ai/v1",
-    defaultModel: "llama-3.3-70b",
+    defaultModel: "llama3.1-8b",
     embeddingModel: "nomic-embed-text",
   },
 };
