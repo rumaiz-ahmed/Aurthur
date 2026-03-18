@@ -60,6 +60,34 @@ function createCommandRegistry(): CommandRegistry {
 
 export const commandRegistry = createCommandRegistry();
 
+import {
+  brainStatusCommand,
+  brainSetProviderCommand,
+  brainModelsCommand,
+  brainLearnCommand,
+  brainReindexCommand,
+  soulCommand,
+  soulReadCommand,
+  soulEditCommand,
+  soulLearnCommand,
+  soulResetCommand,
+  skillsCommand,
+  skillTestCommand,
+} from "./commands";
+
+commandRegistry.register(brainStatusCommand);
+commandRegistry.register(brainSetProviderCommand);
+commandRegistry.register(brainModelsCommand);
+commandRegistry.register(brainLearnCommand);
+commandRegistry.register(brainReindexCommand);
+commandRegistry.register(soulCommand);
+commandRegistry.register(soulReadCommand);
+commandRegistry.register(soulEditCommand);
+commandRegistry.register(soulLearnCommand);
+commandRegistry.register(soulResetCommand);
+commandRegistry.register(skillsCommand);
+commandRegistry.register(skillTestCommand);
+
 commandRegistry.register({
   name: "help",
   aliases: ["commands", "?"],
