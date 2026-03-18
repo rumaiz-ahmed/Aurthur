@@ -30,6 +30,12 @@ export const PROVIDER_PRESETS: Record<string, ProviderConfig> = {
     defaultModel: "llama-3.1-70b-versatile",
     embeddingModel: "thenlper/gte-large",
   },
+  cerebras: {
+    name: "Cerebras",
+    baseUrl: "https://api.cerebras.ai/v1",
+    defaultModel: "llama-3.3-70b",
+    embeddingModel: "nomic-embed-text",
+  },
 };
 
 export function getPreset(name: string): ProviderConfig | undefined {

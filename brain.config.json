@@ -1,7 +1,8 @@
 {
-  "provider": "ollama",
-  "baseUrl": "http://localhost:11434/v1",
-  "model": "llama3",
+  "provider": "cerebras",
+  "baseUrl": "https://api.cerebras.ai/v1",
+  "model": "llama-3.3-70b",
+  "apiKey": "",
   "embeddingModel": "nomic-embed-text",
   "soulPath": "./SOUL.md",
   "knowledgePath": "./knowledge",

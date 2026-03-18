@@ -9,7 +9,7 @@ interface ChatBoxProps {
 export function ChatBox({ messages, currentTyping }: ChatBoxProps) {
   return (
     <box
-      style={{ border: true, borderStyle: "rounded", borderColor: "#00d4ff" }}
+      style={{ border: true, borderStyle: "rounded", borderColor: "#1a1a2e" }}
       flexGrow={1}
       flexDirection="column"
       padding={1}
@@ -20,16 +20,16 @@ export function ChatBox({ messages, currentTyping }: ChatBoxProps) {
         {messages.map((msg: Message) => (
           <box key={msg.id} marginBottom={1}>
             {msg.type === "user" ? (
-              <box flexDirection="column" alignItems="flex-end">
-                <text fg="#ffffff">
-                  <span fg="#888888">&gt; </span>
-                  <span fg="#00ff00">{msg.content}</span>
-                </text>
+              <box flexDirection="column" alignItems="flex-end" width="100%">
+                <text fg="#666666" marginRight={2}>You</text>
+                <box padding={1} maxWidth="80%">
+                  <text fg="#e0e0e0">{msg.content}</text>
+                </box>
               </box>
             ) : (
-              <box flexDirection="column">
+              <box flexDirection="column" width="100%">
                 <text fg="#00d4ff" attributes={TextAttributes.BOLD}>
-                  ARTHUR:
+                  ◇ ARTHUR
                 </text>
                 <text fg="#c0c0c0">{msg.content}</text>
               </box>
@@ -39,7 +39,7 @@ export function ChatBox({ messages, currentTyping }: ChatBoxProps) {
         {currentTyping && (
           <box flexDirection="column">
             <text fg="#00d4ff" attributes={TextAttributes.BOLD}>
-              ARTHUR:
+              ◇ ARTHUR
             </text>
             <text fg="#c0c0c0">
               {currentTyping}

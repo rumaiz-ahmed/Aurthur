@@ -6,12 +6,13 @@ import { Header } from "./Header";
 import { ChatBox } from "./ChatBox";
 import { InputBox } from "./InputBox";
 import { createBrainEngine } from "../brain/engine";
+import { loadConfig } from "../brain/config";
 
 const INITIAL_MESSAGE: Message = {
   id: 0,
   type: "arthur",
   content:
-    "Initializing ARTHUR interface...\nAll systems online.\n\nGood evening, sir. I am ARTHUR. How may I assist you today?",
+    "Initializing ARTHUR interface...\nAll systems online.\n\nGood evening. I am ARTHUR, your personal AI assistant. How may I assist you today?",
   timestamp: new Date(),
 };
 
@@ -22,6 +23,7 @@ export function ArthurApp() {
   const [currentTyping, setCurrentTyping] = useState("");
   const [brainEnabled, setBrainEnabled] = useState(false);
   const [brainError, setBrainError] = useState<string | null>(null);
+  const [provider, setProvider] = useState<string>("");
   const inputRef = useRef("");
   const brainRef = useRef<ReturnType<typeof createBrainEngine> | null>(null);
   const brainInitializedRef = useRef(false);
@@ -32,28 +34,30 @@ export function ArthurApp() {
 
     try {
       brainRef.current = createBrainEngine();
+      const stats = brainRef.current.getStats();
       setBrainEnabled(true);
+      setProvider(`${stats.provider} • ${stats.model}`);
       setBrainError(null);
     } catch (error) {
-      setBrainError(error instanceof Error ? error.message : "Failed to initialize brain");
       setBrainEnabled(false);
+      setBrainError(error instanceof Error ? error.message : "Failed to initialize");
     }
   }, []);
 
   const typeResponse = useCallback(async (text: string) => {
     setCurrentTyping("");
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     const chars = text.split("");
     for (let i = 0; i < chars.length; i++) {
       setCurrentTyping((prev: string) => prev + chars[i]);
       if (chars[i] === "\n") {
-        await new Promise((r) => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 80));
       } else {
-        await new Promise((r) => setTimeout(r, 8));
+        await new Promise((r) => setTimeout(r, 6));
       }
     }
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 150));
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -71,7 +75,8 @@ export function ArthurApp() {
     setInput("");
     setIsProcessing(true);
 
-    const command = commandRegistry.get(inputRef.current.toLowerCase().split(/\s+/)[0] ?? "");
+    const commandName = inputRef.current.toLowerCase().split(/\s+/)[0] ?? "";
+    const command = commandRegistry.get(commandName);
 
     let response: string;
 
@@ -81,10 +86,8 @@ export function ArthurApp() {
       try {
         response = await brainRef.current.think(inputRef.current);
       } catch (error) {
-        response = `Brain error: ${error instanceof Error ? error.message : "Unknown error"}`;
+        response = `Error: ${error instanceof Error ? error.message : "Unknown error"}`;
       }
-    } else if (brainError) {
-      response = `Brain unavailable: ${brainError}`;
     } else {
       response = await commandRegistry.execute(inputRef.current);
     }
@@ -115,7 +118,7 @@ export function ArthurApp() {
     setMessages((prev: Message[]) => [...prev, arthurMessage]);
     setCurrentTyping("");
     setIsProcessing(false);
-  }, [input, isProcessing, typeResponse, brainEnabled, brainError]);
+  }, [input, isProcessing, typeResponse, brainEnabled]);
 
   return (
     <box flexGrow={1} flexDirection="column" padding={1}>
@@ -125,11 +128,16 @@ export function ArthurApp() {
 
       <InputBox value={input} onInput={setInput} onSubmit={handleSubmit} />
 
-      <text fg="#444444" attributes={TextAttributes.DIM}>
-        {brainEnabled 
-          ? 'Type "help" for commands, or just chat with me'
-          : 'Brain unavailable - type "help" for commands'}
-      </text>
+      <box justifyContent="space-between" marginTop={1}>
+        <text fg="#444444" attributes={TextAttributes.DIM}>
+          {brainEnabled 
+            ? `🧠 Brain: ${provider}`
+            : '⚡ Command mode'}
+        </text>
+        <text fg="#444444" attributes={TextAttributes.DIM}>
+          {isProcessing ? "Processing..." : 'Type "help" for commands'}
+        </text>
+      </box>
     </box>
   );
 }
