@@ -249,8 +249,48 @@ adjustments: []
 }
 
 async function main() {
+  // Load .env and generate brain.config.json from it (makes .env the source of truth)
+  if (existsSync(ENV_PATH)) {
+    const envVars: Record<string, string> = {};
+    try {
+      const content = readFileSync(ENV_PATH, "utf-8");
+      for (const line of content.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const eqIdx = trimmed.indexOf("=");
+        if (eqIdx > 0) {
+          const key = trimmed.slice(0, eqIdx).trim();
+          const value = trimmed.slice(eqIdx + 1).trim();
+          envVars[key] = value;
+        }
+      }
+    } catch {}
+
+    // Generate brain.config.json from .env
+    if (envVars.BRAIN_PROVIDER) {
+      const preset = PROVIDER_PRESETS[envVars.BRAIN_PROVIDER];
+      const config = {
+        provider: envVars.BRAIN_PROVIDER,
+        baseUrl: envVars.BRAIN_BASE_URL || preset?.baseUrl || "",
+        model: envVars.BRAIN_MODEL || preset?.defaultModel || "gpt-4",
+        apiKey: envVars.BRAIN_API_KEY || "",
+        embeddingModel: preset?.embeddingModel || "nomic-embed-text",
+        soulPath: "./SOUL.md",
+        knowledgePath: "./knowledge",
+        conversationsPath: "./conversations",
+        learning: {
+          enabled: true,
+          logConversations: true,
+          requestFeedback: true,
+          autoInfer: true,
+        },
+      };
+      writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+    }
+  }
+
   // Check if setup is needed
-  const needsSetup = !existsSync(SOUL_PATH) || !existsSync(CONFIG_PATH);
+  const needsSetup = !existsSync(SOUL_PATH);
 
   if (needsSetup) {
     const proceed = await setupWizard();
