@@ -37,13 +37,13 @@ const DEFAULT_CONFIG: BrainConfig = {
 
 const CONFIG_PATH = "./brain.config.json";
 
-function loadEnvFile(): Record<string, string> {
+function loadEnvFile(): Record<string, string | undefined> {
   const envPath = "./.env";
   if (!existsSync(envPath)) return {};
   
   try {
     const content = readFileSync(envPath, "utf-8");
-    const envVars: Record<string, string> = {};
+    const envVars: Record<string, string | undefined> = {};
     
     for (const line of content.split("\n")) {
       const trimmed = line.trim();
@@ -53,7 +53,8 @@ function loadEnvFile(): Record<string, string> {
       if (eqIdx > 0) {
         const key = trimmed.slice(0, eqIdx).trim();
         const value = trimmed.slice(eqIdx + 1).trim();
-        envVars[key] = value;
+        // Only set if non-empty
+        envVars[key] = value || undefined;
       }
     }
     
@@ -64,50 +65,21 @@ function loadEnvFile(): Record<string, string> {
 }
 
 export function loadConfig(): BrainConfig {
-  // Start with defaults
-  const config = { ...DEFAULT_CONFIG };
-  
-  // Load from .env file first (highest priority)
   const envVars = loadEnvFile();
+  const provider = envVars.BRAIN_PROVIDER || (existsSync(CONFIG_PATH) ? JSON.parse(readFileSync(CONFIG_PATH, "utf-8")).provider : undefined) || DEFAULT_CONFIG.provider;
+  const preset = getPreset(provider);
   
-  if (envVars.BRAIN_PROVIDER) config.provider = envVars.BRAIN_PROVIDER;
-  if (envVars.BRAIN_API_KEY) config.apiKey = envVars.BRAIN_API_KEY;
-  if (envVars.BRAIN_BASE_URL) config.baseUrl = envVars.BRAIN_BASE_URL;
-  if (envVars.BRAIN_MODEL) config.model = envVars.BRAIN_MODEL;
-  
-  // Override with brain.config.json (if it has values)
-  if (existsSync(CONFIG_PATH)) {
-    try {
-      const fileConfig = JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
-      
-      // Only override if env didn't set it
-      if (!envVars.BRAIN_PROVIDER && fileConfig.provider) config.provider = fileConfig.provider;
-      if (!envVars.BRAIN_API_KEY && fileConfig.apiKey) config.apiKey = fileConfig.apiKey;
-      if (!envVars.BRAIN_BASE_URL && fileConfig.baseUrl) config.baseUrl = fileConfig.baseUrl;
-      if (!envVars.BRAIN_MODEL && fileConfig.model) config.model = fileConfig.model;
-      if (fileConfig.embeddingModel) config.embeddingModel = fileConfig.embeddingModel;
-      if (fileConfig.soulPath) config.soulPath = fileConfig.soulPath;
-      if (fileConfig.knowledgePath) config.knowledgePath = fileConfig.knowledgePath;
-      if (fileConfig.conversationsPath) config.conversationsPath = fileConfig.conversationsPath;
-      if (fileConfig.learning) config.learning = { ...config.learning, ...fileConfig.learning };
-    } catch {
-      // Use env/defaults on error
-    }
-  }
-  
-  // Override with process.env (highest priority of all)
-  if (process.env.BRAIN_PROVIDER) config.provider = process.env.BRAIN_PROVIDER;
-  if (process.env.BRAIN_API_KEY) config.apiKey = process.env.BRAIN_API_KEY;
-  if (process.env.BRAIN_BASE_URL) config.baseUrl = process.env.BRAIN_BASE_URL;
-  if (process.env.BRAIN_MODEL) config.model = process.env.BRAIN_MODEL;
-  
-  // Apply preset defaults if not set
-  const preset = getPreset(config.provider);
-  if (preset) {
-    if (!config.baseUrl) config.baseUrl = preset.baseUrl;
-    if (!config.embeddingModel) config.embeddingModel = preset.embeddingModel;
-    if (!config.model) config.model = preset.defaultModel;
-  }
+  const config: BrainConfig = {
+    provider,
+    baseUrl: envVars.BRAIN_BASE_URL || (existsSync(CONFIG_PATH) ? JSON.parse(readFileSync(CONFIG_PATH, "utf-8")).baseUrl : undefined) || preset?.baseUrl || DEFAULT_CONFIG.baseUrl,
+    apiKey: envVars.BRAIN_API_KEY,
+    model: envVars.BRAIN_MODEL || preset?.defaultModel || DEFAULT_CONFIG.model,
+    embeddingModel: preset?.embeddingModel || DEFAULT_CONFIG.embeddingModel,
+    soulPath: DEFAULT_CONFIG.soulPath,
+    knowledgePath: DEFAULT_CONFIG.knowledgePath,
+    conversationsPath: DEFAULT_CONFIG.conversationsPath,
+    learning: DEFAULT_CONFIG.learning,
+  };
   
   return config;
 }

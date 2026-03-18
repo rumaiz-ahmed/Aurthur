@@ -8,6 +8,7 @@ export function Header() {
     model: string;
     brainEnabled: boolean;
     connected: boolean;
+    error?: string;
   }>({ provider: "", model: "", brainEnabled: false, connected: false });
 
   useEffect(() => {
@@ -18,14 +19,16 @@ export function Header() {
         provider: s.provider,
         model: s.model,
         brainEnabled: true,
-        connected: s.provider !== "Command-only",
+        connected: true,
       });
-    } catch {
+    } catch (error) {
+      console.error("Brain init error:", error);
       setStats({
         provider: "Offline",
-        model: "No brain",
+        model: error instanceof Error ? error.message.slice(0, 30) : "Init failed",
         brainEnabled: false,
         connected: false,
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }, []);
@@ -59,6 +62,11 @@ export function Header() {
         {stats.brainEnabled && (
           <text fg="#666666">
             {stats.model}
+          </text>
+        )}
+        {stats.error && (
+          <text fg="#ff6b6b" attributes={TextAttributes.DIM}>
+            {stats.error}
           </text>
         )}
       </box>
