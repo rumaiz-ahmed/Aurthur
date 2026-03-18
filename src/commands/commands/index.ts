@@ -1,0 +1,12 @@
+export { timeCommand } from "./time";
+export { dateCommand } from "./date";
+export { aboutCommand } from "./about";
+export { statusCommand } from "./status";
+export { jokeCommand } from "./joke";
+export { fortuneCommand } from "./fortune";
+export { quoteCommand } from "./quote";
+export { weatherCommand } from "./weather";
+export { sysinfoCommand } from "./sysinfo";
+export { helloCommand } from "./hello";
+export { openCommand } from "./open";
+export { searchWebCommand } from "./search-web";
